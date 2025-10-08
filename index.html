@@ -85,10 +85,8 @@
         }
 
         /* --------------------------------- */
-        /* 추가된 메뉴 관련 CSS */
+        /* 메뉴 관련 CSS */
         /* --------------------------------- */
-
-        /* 햄버거 메뉴 */
         .menu-btn { 
             position: fixed; top: 20px; left: 20px; width: 50px; height: 50px; 
             background: white; border-radius: 10px; cursor: pointer; z-index: 1001; 
@@ -150,7 +148,7 @@
             <li class="menu-item" onclick="goToPage('font')">
                 🎨 폰트 변환기
             </li>
-            <li class="https://guard6.github.io/unicode-tool-index.html/index1.html" onclick="goToPage('unicode')">
+            <li class="menu-item" onclick="goToPage('unicode')">
                 🔧 특수문자 라이브러리
             </li>
             <li class="menu-item disabled">
@@ -356,7 +354,7 @@
         }
 
         // ---------------------------------
-        // 추가된 메뉴 관련 JavaScript
+        // 메뉴 관련 JavaScript (링크 업데이트됨)
         // ---------------------------------
 
         // 메뉴 토글
@@ -370,25 +368,31 @@
             btn.classList.toggle('active');
         }
         
-        // 페이지 이동 (나중에 링크 추가)
+        // 페이지 이동 함수
         function goToPage(page) {
-            // TODO: 여기에 각 페이지 링크를 추가하세요
+            // 여기에 각 페이지 링크를 추가하세요
             const links = {
                 'home': '/', // 홈 페이지 링크
                 'font': '/font-generator.html', // 폰트 변환기 링크 (현재 페이지)
-                'unicode': 'https://guard6.github.io/unicode-tool-index.html/index1.html', // 특수문자 라이브러리 링크
+                // ✅ 사용자 요청: 특수문자 라이브러리 링크 업데이트
+                'unicode': 'https://guard6.github.io/unicode-tool-index.html/index1.html', 
             };
             
             if (links[page]) {
-                // window.location.href = links[page]; // 링크 활성화하려면 주석 해제
-                alert('페이지 이동: ' + page + '\n\n코드에서 goToPage() 함수의 링크를 설정하세요!');
+                if (page === 'unicode') {
+                    window.location.href = links[page]; // 실제로 페이지 이동
+                } else {
+                    // Placeholder for other pages
+                    alert('페이지 이동: ' + page + '\n\n현재 이 페이지는 준비 중입니다.');
+                }
             }
             toggleMenu(); // 메뉴 닫기
         }
 
-        // 전문가용 문자표로 이동 (기존 함수 재정의)
+        // 전문가용 문자표로 이동 (버튼)
         function goToExpertMode() {
-            goToPage('unicode'); // 메뉴에서 특수문자 라이브러리 항목 호출
+            // ✅ 사용자 요청: 전문가용 문자표도 해당 링크로 직접 이동
+            window.location.href = 'https://guard6.github.io/unicode-tool-index.html/index1.html';
         }
 
         // Enter 키로도 변환 가능하게
