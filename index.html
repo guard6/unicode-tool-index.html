@@ -3,158 +3,445 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>유니코드 폰트 변환기</title>
+    <title>✨ 인스타 폰트 변환기 - 특수문자 영어글씨체</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-            max-width: 600px;
-            margin: 0 auto;
-            text-align: center;
-        }
-        textarea {
-            width: 100%;
-            min-height: 100px;
-            padding: 10px;
-            margin-bottom: 10px;
+        * {
+            margin: 0;
+            padding: 0;
             box-sizing: border-box;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 16px;
         }
-        #outputBox {
-            background-color: #f4f4f4;
-            border: 1px dashed #ddd;
-            padding: 15px;
-            min-height: 50px;
-            word-wrap: break-word; /* 긴 텍스트 줄바꿈 */
-            margin-bottom: 15px;
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            padding: 30px 20px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .subtitle {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .input-section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+        }
+
+        .input-label {
             font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+            display: block;
         }
-        button {
-            padding: 10px 20px;
-            background-color: #4CAF50;
+
+        #textInput {
+            width: 100%;
+            padding: 20px;
+            font-size: 1.2em;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            resize: vertical;
+            min-height: 120px;
+            font-family: inherit;
+            transition: border 0.3s;
+        }
+
+        #textInput:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .generate-btn {
+            width: 100%;
+            padding: 18px;
+            font-size: 1.3em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 15px;
             cursor: pointer;
-            font-size: 16px;
-            margin: 5px;
+            margin-top: 20px;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
-        button:hover {
-            background-color: #45a049;
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
         }
-        .message {
+
+        .generate-btn:active {
+            transform: translateY(0);
+        }
+
+        .expert-btn {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.1em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
             margin-top: 15px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .expert-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(240, 147, 251, 0.4);
+        }
+
+        .expert-btn:active {
+            transform: translateY(0);
+        }
+
+        .info-box {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .info-box h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .info-box ul {
+            margin-left: 20px;
+            color: #666;
+        }
+
+        .info-box li {
+            margin: 5px 0;
+        }
+
+        .results-section {
+            display: none;
+        }
+
+        .results-section.show {
+            display: block;
+        }
+
+        .section-title {
+            color: white;
+            font-size: 1.8em;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .font-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .font-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .font-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .font-name {
+            font-size: 0.9em;
+            color: #999;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .font-preview {
+            font-size: 1.5em;
             color: #333;
+            word-wrap: break-word;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+        }
+
+        .copy-notice {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4CAF50;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+            display: none;
+        }
+
+        .copy-notice.show {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+            
+            .font-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
+    <div class="container">
+        <header>
+            <h1>✨ 인스타 폰트 변환기</h1>
+            <p class="subtitle">영어를 특수문자 폰트로 변환하세요</p>
+        </header>
 
-    <h1>✨ 둥근 글씨 변환기 (GitHub Pages) ✨</h1>
+        <div class="input-section">
+            <label class="input-label">텍스트 입력</label>
+            <textarea id="textInput" placeholder="여기에 영어 텍스트를 입력하세요...&#10;예: Hello World"></textarea>
+            
+            <button class="generate-btn" onclick="generateFonts()">🎨 변환하기</button>
 
-    <h2>1. 텍스트 입력</h2>
-    <textarea id="inputBox" oninput="handleConversion()" placeholder="여기에 변환할 텍스트를 입력하세요. (입력 즉시 변환됩니다)"></textarea>
+            <button class="expert-btn" onclick="goToExpertMode()">
+                🔧 전문가용 문자표 보기
+            </button>
 
-    <h2>2. 변환 결과</h2>
-    <div id="outputBox"></div>
-    
-    <button onclick="copyToClipboard()">복사하기</button>
+            <div class="info-box">
+                <h3>💡 사용 방법</h3>
+                <ul>
+                    <li>영어 알파벳과 숫자를 입력하세요 (소문자/대문자 모두 지원)</li>
+                    <li>'변환하기' 버튼을 클릭하세요</li>
+                    <li>마음에 드는 폰트를 클릭하면 자동으로 복사됩니다</li>
+                    <li>복사한 텍스트를 인스타그램, 페이스북 등에 붙여넣으세요</li>
+                </ul>
+            </div>
+        </div>
 
-    <p id="copyMessage" class="message"></p>
+        <div class="results-section" id="resultsSection">
+            <h2 class="section-title">🎯 변환된 폰트 (클릭하면 복사됩니다)</h2>
+            <div class="font-grid" id="fontGrid"></div>
+        </div>
+    </div>
+
+    <div class="copy-notice" id="copyNotice">
+        ✅ 클립보드에 복사되었습니다!
+    </div>
 
     <script>
-        // --- 폰트 변환 로직 ---
-
-        const CIRCLED_MAP = {
-            // 대문자 (A-Z)
-            'A': 'Ⓐ', 'B': 'Ⓑ', 'C': 'Ⓒ', 'D': 'Ⓓ', 'E': 'Ⓔ',
-            'F': 'Ⓕ', 'G': 'Ⓖ', 'H': 'Ⓗ', 'I': 'Ⓘ', 'J': 'Ⓙ',
-            'K': 'Ⓚ', 'L': 'Ⓜ', 'M': 'Ⓜ', 'N': 'Ⓝ', 'O': 'Ⓞ',
-            'P': 'Ⓟ', 'Q': 'Ⓠ', 'R': 'Ⓡ', 'S': 'Ⓢ', 'T': 'Ⓣ',
-            'U': 'Ⓤ', 'V': 'Ⓥ', 'W': 'Ⓦ', 'X': 'Ⓧ', 'Y': 'Ⓨ',
-            'Z': 'Ⓩ',
-
-            // 소문자 (a-z)
-            'a': 'ⓐ', 'b': 'ⓑ', 'c': 'ⓒ', 'd': 'ⓓ', 'e': 'ⓔ',
-            'f': 'ⓕ', 'g': 'ⓖ', 'h': 'ⓗ', 'i': 'ⓘ', 'j': 'ⓙ',
-            'k': 'ⓚ', 'l': 'ⓛ', 'm': 'ⓜ', 'n': 'ⓝ', 'o': 'ⓞ',
-            'p': 'ⓟ', 'q': 'ⓠ', 'r': 'ⓡ', 's': 'ⓢ', 't': 'ⓣ',
-            'u': 'ⓤ', 'v': 'ⓥ', 'w': 'ⓦ', 'x': 'ⓧ', 'y': 'ⓨ',
-            'z': 'ⓩ',
-
-            // 숫자 (0-9)
-            '0': '⓪', '1': '①', '2': '②', '3': '③', '4': '④',
-            '5': '⑤', '6': '⑥', '7': '⑦', '8': '⑧', '9': '⑨'
+        // 유니코드 폰트 매핑
+        const fontStyles = {
+            '볼드체': {
+                map: {
+                    'A':'𝐀','B':'𝐁','C':'𝐂','D':'𝐃','E':'𝐄','F':'𝐅','G':'𝐆','H':'𝐇','I':'𝐈','J':'𝐉','K':'𝐊','L':'𝐋','M':'𝐌','N':'𝐍','O':'𝐎','P':'𝐏','Q':'𝐐','R':'𝐑','S':'𝐒','T':'𝐓','U':'𝐔','V':'𝐕','W':'𝐖','X':'𝐗','Y':'𝐘','Z':'𝐙',
+                    'a':'𝐚','b':'𝐛','c':'𝐜','d':'𝐝','e':'𝐞','f':'𝐟','g':'𝐠','h':'𝐡','i':'𝐢','j':'𝐣','k':'𝐤','l':'𝐥','m':'𝐦','n':'𝐧','o':'𝐨','p':'𝐩','q':'𝐪','r':'𝐫','s':'𝐬','t':'𝐭','u':'𝐮','v':'𝐯','w':'𝐰','x':'𝐱','y':'𝐲','z':'𝐳',
+                    '0':'𝟎','1':'𝟏','2':'𝟐','3':'𝟑','4':'𝟒','5':'𝟓','6':'𝟔','7':'𝟕','8':'𝟖','9':'𝟗'
+                }
+            },
+            '이탤릭체': {
+                map: {
+                    'A':'𝐴','B':'𝐵','C':'𝐶','D':'𝐷','E':'𝐸','F':'𝐹','G':'𝐺','H':'𝐻','I':'𝐼','J':'𝐽','K':'𝐾','L':'𝐿','M':'𝑀','N':'𝑁','O':'𝑂','P':'𝑃','Q':'𝑄','R':'𝑅','S':'𝑆','T':'𝑇','U':'𝑈','V':'𝑉','W':'𝑊','X':'𝑋','Y':'𝑌','Z':'𝑍',
+                    'a':'𝑎','b':'𝑏','c':'𝑐','d':'𝑑','e':'𝑒','f':'𝑓','g':'𝑔','h':'ℎ','i':'𝑖','j':'𝑗','k':'𝑘','l':'𝑙','m':'𝑚','n':'𝑛','o':'𝑜','p':'𝑝','q':'𝑞','r':'𝑟','s':'𝑠','t':'𝑡','u':'𝑢','v':'𝑣','w':'𝑤','x':'𝑥','y':'𝑦','z':'𝑧'
+                }
+            },
+            '볼드 이탤릭': {
+                map: {
+                    'A':'𝑨','B':'𝑩','C':'𝑪','D':'𝑫','E':'𝑬','F':'𝑭','G':'𝑮','H':'𝑯','I':'𝑰','J':'𝑱','K':'𝑲','L':'𝑳','M':'𝑴','N':'𝑵','O':'𝑶','P':'𝑷','Q':'𝑸','R':'𝑹','S':'𝑺','T':'𝑻','U':'𝑼','V':'𝑽','W':'𝑾','X':'𝑿','Y':'𝒀','Z':'𝒁',
+                    'a':'𝒂','b':'𝒃','c':'𝒄','d':'𝒅','e':'𝒆','f':'𝒇','g':'𝒈','h':'𝒉','i':'𝒊','j':'𝒋','k':'𝒌','l':'𝒍','m':'𝒎','n':'𝒏','o':'𝒐','p':'𝒑','q':'𝒒','r':'𝒓','s':'𝒔','t':'𝒕','u':'𝒖','v':'𝒗','w':'𝒘','x':'𝒙','y':'𝒚','z':'𝒛'
+                }
+            },
+            '필기체': {
+                map: {
+                    'A':'𝒜','B':'ℬ','C':'𝒞','D':'𝒟','E':'ℰ','F':'ℱ','G':'𝒢','H':'ℋ','I':'ℐ','J':'𝒥','K':'𝒦','L':'ℒ','M':'ℳ','N':'𝒩','O':'𝒪','P':'𝒫','Q':'𝒬','R':'ℛ','S':'𝒮','T':'𝒯','U':'𝒰','V':'𝒱','W':'𝒲','X':'𝒳','Y':'𝒴','Z':'𝒵',
+                    'a':'𝒶','b':'𝒷','c':'𝒸','d':'𝒹','e':'ℯ','f':'𝒻','g':'ℊ','h':'𝒽','i':'𝒾','j':'𝒿','k':'𝓀','l':'𝓁','m':'𝓂','n':'𝓃','o':'ℴ','p':'𝓅','q':'𝓆','r':'𝓇','s':'𝓈','t':'𝓉','u':'𝓊','v':'𝓋','w':'𝓌','x':'𝓍','y':'𝓎','z':'𝓏'
+                }
+            },
+            '볼드 필기체': {
+                map: {
+                    'A':'𝓐','B':'𝓑','C':'𝓒','D':'𝓓','E':'𝓔','F':'𝓕','G':'𝓖','H':'𝓗','I':'𝓘','J':'𝓙','K':'𝓚','L':'𝓛','M':'𝓜','N':'𝓝','O':'𝓞','P':'𝓟','Q':'𝓠','R':'𝓡','S':'𝓢','T':'𝓣','U':'𝓤','V':'𝓥','W':'𝓦','X':'𝓧','Y':'𝓨','Z':'𝓩',
+                    'a':'𝓪','b':'𝓫','c':'𝓬','d':'𝓭','e':'𝓮','f':'𝓯','g':'𝓰','h':'𝓱','i':'𝓲','j':'𝓳','k':'𝓴','l':'𝓵','m':'𝓶','n':'𝓷','o':'𝓸','p':'𝓹','q':'𝓺','r':'𝓻','s':'𝓼','t':'𝓽','u':'𝓾','v':'𝓿','w':'𝔀','x':'𝔁','y':'𝔂','z':'𝔃'
+                }
+            },
+            '더블 라인': {
+                map: {
+                    'A':'𝔸','B':'𝔹','C':'ℂ','D':'𝔻','E':'𝔼','F':'𝔽','G':'𝔾','H':'ℍ','I':'𝕀','J':'𝕁','K':'𝕂','L':'𝕃','M':'𝕄','N':'ℕ','O':'𝕆','P':'ℙ','Q':'ℚ','R':'ℝ','S':'𝕊','T':'𝕋','U':'𝕌','V':'𝕍','W':'𝕎','X':'𝕏','Y':'𝕐','Z':'ℤ',
+                    'a':'𝕒','b':'𝕓','c':'𝕔','d':'𝕕','e':'𝕖','f':'𝕗','g':'𝕘','h':'𝕙','i':'𝕚','j':'𝕛','k':'𝕜','l':'𝕝','m':'𝕞','n':'𝕟','o':'𝕠','p':'𝕡','q':'𝕢','r':'𝕣','s':'𝕤','t':'𝕥','u':'𝕦','v':'𝕧','w':'𝕨','x':'𝕩','y':'𝕪','z':'𝕫',
+                    '0':'𝟘','1':'𝟙','2':'𝟚','3':'𝟛','4':'𝟜','5':'𝟝','6':'𝟞','7':'𝟟','8':'𝟠','9':'𝟡'
+                }
+            },
+            '고딕체': {
+                map: {
+                    'A':'𝔄','B':'𝔅','C':'ℭ','D':'𝔇','E':'𝔈','F':'𝔉','G':'𝔊','H':'ℌ','I':'ℑ','J':'𝔍','K':'𝔎','L':'𝔏','M':'𝔐','N':'𝔑','O':'𝔒','P':'𝔓','Q':'𝔔','R':'ℜ','S':'𝔖','T':'𝔗','U':'𝔘','V':'𝔙','W':'𝔚','X':'𝔛','Y':'𝔜','Z':'ℨ',
+                    'a':'𝔞','b':'𝔟','c':'𝔠','d':'𝔡','e':'𝔢','f':'𝔣','g':'𝔤','h':'𝔥','i':'𝔦','j':'𝔧','k':'𝔨','l':'𝔩','m':'𝔪','n':'𝔫','o':'𝔬','p':'𝔭','q':'𝔮','r':'𝔯','s':'𝔰','t':'𝔱','u':'𝔲','v':'𝔳','w':'𝔴','x':'𝔵','y':'𝔶','z':'𝔷'
+                }
+            },
+            '볼드 고딕': {
+                map: {
+                    'A':'𝕬','B':'𝕭','C':'𝕮','D':'𝕯','E':'𝕰','F':'𝕱','G':'𝕲','H':'𝕳','I':'𝕴','J':'𝕵','K':'𝕶','L':'𝕷','M':'𝕸','N':'𝕹','O':'𝕺','P':'𝕻','Q':'𝕼','R':'𝕽','S':'𝕾','T':'𝕿','U':'𝖀','V':'𝖁','W':'𝖂','X':'𝖃','Y':'𝖄','Z':'𝖅',
+                    'a':'𝖆','b':'𝖇','c':'𝖈','d':'𝖉','e':'𝖊','f':'𝖋','g':'𝖌','h':'𝖍','i':'𝖎','j':'𝖏','k':'𝖐','l':'𝖑','m':'𝖒','n':'𝖓','o':'𝖔','p':'𝖕','q':'𝖖','r':'𝖗','s':'𝖘','t':'𝖙','u':'𝖚','v':'𝖛','w':'𝖜','x':'𝖝','y':'𝖞','z':'𝖟'
+                }
+            },
+            '모노스페이스': {
+                map: {
+                    'A':'𝙰','B':'𝙱','C':'𝙲','D':'𝙳','E':'𝙴','F':'𝙵','G':'𝙶','H':'𝙷','I':'𝙸','J':'𝙹','K':'𝙺','L':'𝙻','M':'𝙼','N':'𝙽','O':'𝙾','P':'𝙿','Q':'𝚀','R':'𝚁','S':'𝚂','T':'𝚃','U':'𝚄','V':'𝚅','W':'𝚆','X':'𝚇','Y':'𝚈','Z':'𝚉',
+                    'a':'𝚊','b':'𝚋','c':'𝚌','d':'𝚍','e':'𝚎','f':'𝚏','g':'𝚐','h':'𝚑','i':'𝚒','j':'𝚓','k':'𝚔','l':'𝚕','m':'𝚖','n':'𝚗','o':'𝚘','p':'𝚙','q':'𝚚','r':'𝚛','s':'𝚜','t':'𝚝','u':'𝚞','v':'𝚟','w':'𝚠','x':'𝚡','y':'𝚢','z':'𝚣',
+                    '0':'𝟶','1':'𝟷','2':'𝟸','3':'𝟹','4':'𝟺','5':'𝟻','6':'𝟼','7':'𝟽','8':'𝟾','9':'𝟿'
+                }
+            },
+            '동그라미': {
+                map: {
+                    'A':'Ⓐ','B':'Ⓑ','C':'Ⓒ','D':'Ⓓ','E':'Ⓔ','F':'Ⓕ','G':'Ⓖ','H':'Ⓗ','I':'Ⓘ','J':'Ⓙ','K':'Ⓚ','L':'Ⓛ','M':'Ⓜ','N':'Ⓝ','O':'Ⓞ','P':'Ⓟ','Q':'Ⓠ','R':'Ⓡ','S':'Ⓢ','T':'Ⓣ','U':'Ⓤ','V':'Ⓥ','W':'Ⓦ','X':'Ⓧ','Y':'Ⓨ','Z':'Ⓩ',
+                    'a':'ⓐ','b':'ⓑ','c':'ⓒ','d':'ⓓ','e':'ⓔ','f':'ⓕ','g':'ⓖ','h':'ⓗ','i':'ⓘ','j':'ⓙ','k':'ⓚ','l':'ⓛ','m':'ⓜ','n':'ⓝ','o':'ⓞ','p':'ⓟ','q':'ⓠ','r':'ⓡ','s':'ⓢ','t':'ⓣ','u':'ⓤ','v':'ⓥ','w':'ⓦ','x':'ⓧ','y':'ⓨ','z':'ⓩ',
+                    '0':'⓪','1':'①','2':'②','3':'③','4':'④','5':'⑤','6':'⑥','7':'⑦','8':'⑧','9':'⑨'
+                }
+            },
+            '네모': {
+                map: {
+                    'A':'🄰','B':'🄱','C':'🄲','D':'🄳','E':'🄴','F':'🄵','G':'🄶','H':'🄷','I':'🄸','J':'🄹','K':'🄺','L':'🄻','M':'🄼','N':'🄽','O':'🄾','P':'🄿','Q':'🅀','R':'🅁','S':'🅂','T':'🅃','U':'🅄','V':'🅅','W':'🅆','X':'🅇','Y':'🅈','Z':'🅉',
+                    'a':'🄰','b':'🄱','c':'🄲','d':'🄳','e':'🄴','f':'🄵','g':'🄶','h':'🄷','i':'🄸','j':'🄹','k':'🄺','l':'🄻','m':'🄼','n':'🄽','o':'🄾','p':'🄿','q':'🅀','r':'🅁','s':'🅂','t':'🅃','u':'🅄','v':'🅅','w':'🅆','x':'🅇','y':'🅈','z':'🅉'
+                }
+            },
+            '거꾸로': {
+                map: {
+                    'A':'ɐ','B':'q','C':'ɔ','D':'p','E':'ǝ','F':'ɟ','G':'ƃ','H':'ɥ','I':'ᴉ','J':'ɾ','K':'ʞ','L':'l','M':'ɯ','N':'u','O':'o','P':'d','Q':'b','R':'ɹ','S':'s','T':'ʇ','U':'n','V':'ʌ','W':'ʍ','X':'x','Y':'ʎ','Z':'z',
+                    'a':'ɐ','b':'q','c':'ɔ','d':'p','e':'ǝ','f':'ɟ','g':'ƃ','h':'ɥ','i':'ᴉ','j':'ɾ','k':'ʞ','l':'l','m':'ɯ','n':'u','o':'o','p':'d','q':'b','r':'ɹ','s':'s','t':'ʇ','u':'n','v':'ʌ','w':'ʍ','x':'x','y':'ʎ','z':'z',
+                    '0':'0','1':'Ɩ','2':'ᄅ','3':'Ɛ','4':'ㄣ','5':'ϛ','6':'9','7':'ㄥ','8':'8','9':'6'
+                }
+            },
+            '작은 글씨': {
+                map: {
+                    'A':'ᴀ','B':'ʙ','C':'ᴄ','D':'ᴅ','E':'ᴇ','F':'ғ','G':'ɢ','H':'ʜ','I':'ɪ','J':'ᴊ','K':'ᴋ','L':'ʟ','M':'ᴍ','N':'ɴ','O':'ᴏ','P':'ᴘ','Q':'ǫ','R':'ʀ','S':'s','T':'ᴛ','U':'ᴜ','V':'ᴠ','W':'ᴡ','X':'x','Y':'ʏ','Z':'ᴢ',
+                    'a':'ᴀ','b':'ʙ','c':'ᴄ','d':'ᴅ','e':'ᴇ','f':'ғ','g':'ɢ','h':'ʜ','i':'ɪ','j':'ᴊ','k':'ᴋ','l':'ʟ','m':'ᴍ','n':'ɴ','o':'ᴏ','p':'ᴘ','q':'ǫ','r':'ʀ','s':'s','t':'ᴛ','u':'ᴜ','v':'ᴠ','w':'ᴡ','x':'x','y':'ʏ','z':'ᴢ'
+                }
+            }
         };
 
-        /**
-         * 텍스트를 둥근 글씨체 유니코드로 변환하는 함수
-         * @param {string} text 변환할 원본 문자열
-         * @returns {string} 변환된 둥근 글씨체 문자열
-         */
-        function convertToCircledText(text) {
-            let convertedText = '';
-            for (let i = 0; i < text.length; i++) {
-                const char = text[i];
-                // 대문자, 소문자, 숫자가 아닌 문자는 그대로 유지
-                convertedText += CIRCLED_MAP[char] || char; 
+        function convertText(text, fontMap) {
+            let result = '';
+            for (let char of text) {
+                result += fontMap[char] || char;
             }
-            return convertedText;
+            return result;
         }
 
-        // --- DOM 및 이벤트 핸들링 ---
-
-        const inputBox = document.getElementById('inputBox');
-        const outputBox = document.getElementById('outputBox');
-        const copyMessage = document.getElementById('copyMessage');
-
-        /** 입력 박스에 내용이 바뀔 때마다 변환 및 출력 */
-        function handleConversion() {
-            const originalText = inputBox.value;
-            const converted = convertToCircledText(originalText);
-            outputBox.innerText = converted;
-            // 입력 시에는 복사 메시지를 초기화
-            copyMessage.innerText = ''; 
-        }
-
-        /** 클립보드 복사 기능 */
-        function copyToClipboard() {
-            const textToCopy = outputBox.innerText;
-
-            if (!textToCopy) {
-                copyMessage.innerText = "변환할 텍스트가 없습니다.";
+        function generateFonts() {
+            const input = document.getElementById('textInput').value;
+            
+            if (!input.trim()) {
+                alert('텍스트를 입력해주세요!');
                 return;
             }
 
-            // Clipboard API 사용 (가장 깔끔하고 최신 방식)
-            if (navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard.writeText(textToCopy)
-                    .then(() => {
-                        copyMessage.innerText = "✅ 둥근 글씨가 클립보드에 복사되었습니다!";
-                    })
-                    .catch(err => {
-                        console.error("복사 실패:", err);
-                        copyMessage.innerText = "❌ 복사 기능이 지원되지 않아 수동으로 복사해야 합니다.";
-                    });
-            } else {
-                // 구형 브라우저 또는 HTTP 환경을 위한 대체 복사 방법
-                try {
-                    // 임시 textarea를 생성하여 복사 실행
-                    const tempTextarea = document.createElement('textarea');
-                    tempTextarea.value = textToCopy;
-                    document.body.appendChild(tempTextarea);
-                    tempTextarea.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(tempTextarea);
-                    copyMessage.innerText = "✅ 둥근 글씨가 클립보드에 복사되었습니다!";
-                } catch (err) {
-                    copyMessage.innerText = "❌ 복사 기능이 지원되지 않아 수동으로 복사해야 합니다.";
-                }
+            const grid = document.getElementById('fontGrid');
+            const resultsSection = document.getElementById('resultsSection');
+            
+            grid.innerHTML = '';
+            
+            for (let [styleName, styleData] of Object.entries(fontStyles)) {
+                const converted = convertText(input, styleData.map);
+                
+                const card = document.createElement('div');
+                card.className = 'font-card';
+                card.onclick = () => copyToClipboard(converted);
+                
+                card.innerHTML = `
+                    <div class="font-name">${styleName}</div>
+                    <div class="font-preview">${converted}</div>
+                `;
+                
+                grid.appendChild(card);
             }
+            
+            resultsSection.classList.add('show');
+            resultsSection.scrollIntoView({ behavior: 'smooth' });
         }
-    </script>
 
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showCopyNotice();
+            }).catch(err => {
+                // 대체 복사 방법
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                showCopyNotice();
+            });
+        }
+
+        function showCopyNotice() {
+            const notice = document.getElementById('copyNotice');
+            notice.classList.add('show');
+            
+            setTimeout(() => {
+                notice.classList.remove('show');
+            }, 2000);
+        }
+
+        // 전문가용 문자표로 이동 (나중에 링크 추가)
+        function goToExpertMode() {
+            // TODO: 여기에 링크 주소를 넣으세요
+            // window.location.href = '여기에_링크_주소';
+            alert('아직 링크가 설정되지 않았습니다.\n\n코드에서 goToExpertMode() 함수의 주소를 변경하세요.');
+        }
+
+        // Enter 키로도 변환 가능하게
+        document.getElementById('textInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                generateFonts();
+            }
+        });
+    </script>
 </body>
 </html>
