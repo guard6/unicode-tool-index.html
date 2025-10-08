@@ -1,231 +1,235 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>✨ 전문가용 특수문자 라이브러리</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        /* 배경색 및 기본 설정 복구 */
-        body { font-family: 'Noto Sans KR', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
-        .container { max-width: 1400px; margin: 0 auto; }
-        
-        /* 햄버거 메뉴 */
-        .menu-btn { position: fixed; top: 20px; left: 20px; width: 50px; height: 50px; background: white; border-radius: 10px; cursor: pointer; z-index: 1001; box-shadow: 0 5px 20px rgba(0,0,0,0.3); display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 6px; transition: all 0.3s; }
-        .menu-btn:hover { transform: scale(1.05); }
-        .menu-btn span { width: 30px; height: 3px; background: #667eea; border-radius: 2px; transition: all 0.3s; }
-        .menu-btn.active span:nth-child(1) { transform: rotate(45deg) translate(8px, 8px); }
-        .menu-btn.active span:nth-child(2) { opacity: 0; }
-        .menu-btn.active span:nth-child(3) { transform: rotate(-45deg) translate(8px, -8px); }
-        
-        /* 사이드 메뉴 */
-        .side-menu { position: fixed; top: 0; left: -300px; width: 300px; height: 100vh; background: white; box-shadow: 5px 0 20px rgba(0,0,0,0.3); z-index: 1000; transition: left 0.3s; overflow-y: auto; }
-        .side-menu.open { left: 0; }
-        .menu-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px 20px; font-size: 1.3em; font-weight: bold; }
-        .menu-list { list-style: none; padding: 20px 0; }
-        .menu-item { padding: 18px 25px; border-bottom: 1px solid #f0f0f0; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 10px; font-size: 1.05em; }
-        .menu-item:hover { background: #f8f9fa; padding-left: 30px; color: #667eea; }
-        .menu-item.disabled { opacity: 0.5; cursor: not-allowed; color: #999; }
-        .menu-item.disabled:hover { background: white; padding-left: 25px; }
-        
-        /* 오버레이 */
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; display: none; }
-        .overlay.show { display: block; }
-        
-        header { text-align: center; color: white; margin-bottom: 30px; padding: 20px; }
-        h1 { font-size: 2.2em; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
-        .subtitle { font-size: 1em; opacity: 0.9; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✨ 전문가용 특수문자 라이브러리</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        /* 배경색 및 기본 설정 복구 */
+        body { font-family: 'Noto Sans KR', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+        .container { max-width: 1400px; margin: 0 auto; }
+        
+        /* 햄버거 메뉴 */
+        .menu-btn { position: fixed; top: 20px; left: 20px; width: 50px; height: 50px; background: white; border-radius: 10px; cursor: pointer; z-index: 1001; box-shadow: 0 5px 20px rgba(0,0,0,0.3); display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 6px; transition: all 0.3s; }
+        .menu-btn:hover { transform: scale(1.05); }
+        .menu-btn span { width: 30px; height: 3px; background: #667eea; border-radius: 2px; transition: all 0.3s; }
+        .menu-btn.active span:nth-child(1) { transform: rotate(45deg) translate(8px, 8px); }
+        .menu-btn.active span:nth-child(2) { opacity: 0; }
+        .menu-btn.active span:nth-child(3) { transform: rotate(-45deg) translate(8px, -8px); }
+        
+        /* 사이드 메뉴 */
+        .side-menu { position: fixed; top: 0; left: -300px; width: 300px; height: 100vh; background: white; box-shadow: 5px 0 20px rgba(0,0,0,0.3); z-index: 1000; transition: left 0.3s; overflow-y: auto; }
+        .side-menu.open { left: 0; }
+        .menu-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px 20px; font-size: 1.3em; font-weight: bold; }
+        .menu-list { list-style: none; padding: 20px 0; }
+        .menu-item { padding: 18px 25px; border-bottom: 1px solid #f0f0f0; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 10px; font-size: 1.05em; }
+        .menu-item:hover { background: #f8f9fa; padding-left: 30px; color: #667eea; }
+        .menu-item.disabled { opacity: 0.5; cursor: not-allowed; color: #999; }
+        .menu-item.disabled:hover { background: white; padding-left: 25px; }
+        
+        /* 오버레이 */
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; display: none; }
+        .overlay.show { display: block; }
+        
+        header { text-align: center; color: white; margin-bottom: 30px; padding: 20px; }
+        h1 { font-size: 2.2em; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
+        .subtitle { font-size: 1em; opacity: 0.9; }
         /* UI 요소 배경 복구 */
-        .controls { background: white; border-radius: 20px; padding: 25px; margin-bottom: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
-        .control-row { display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; }
-        .category-select { flex: 1; min-width: 200px; padding: 15px; font-size: 1.1em; border: 2px solid #e0e0e0; border-radius: 10px; background: white; cursor: pointer; }
-        .search-box { flex: 2; min-width: 250px; padding: 15px; font-size: 1.1em; border: 2px solid #e0e0e0; border-radius: 10px; }
-        .selected-chars { background: #f8f9fa; border: 2px dashed #667eea; border-radius: 10px; padding: 20px; min-height: 80px; font-size: 1.5em; word-wrap: break-word; margin-bottom: 15px; }
-        .selected-chars.empty { color: #999; font-size: 1em; display: flex; align-items: center; justify-content: center; }
-        .action-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
-        .btn { padding: 12px 24px; font-size: 1em; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; transition: all 0.3s; }
-        .btn-copy { flex: 1; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
-        .btn-copy:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4); }
-        .btn-clear { background: #e0e0e0; color: #666; }
-        .info-banner { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 15px 20px; border-radius: 15px; margin-bottom: 20px; text-align: center; font-weight: bold; }
-        .char-grid { background: white; border-radius: 20px; padding: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); min-height: 400px; }
-        .category-title { font-size: 1.5em; color: #333; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 3px solid #667eea; }
-        .char-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 10px; }
-        .char-item { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 2em; background: #f8f9fa; border: 2px solid #e0e0e0; border-radius: 10px; cursor: pointer; transition: all 0.2s; user-select: none; }
-        .char-item:hover { background: #667eea; color: white; transform: scale(1.1); border-color: #667eea; box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3); }
-        .copy-notice { position: fixed; top: 20px; right: 20px; background: #4CAF50; color: white; padding: 15px 25px; border-radius: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.3); z-index: 1000; display: none; }
-        .copy-notice.show { display: block; animation: slideIn 0.3s ease-out; }
-        @keyframes slideIn { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        .loading { text-align: center; padding: 60px; color: #999; font-size: 1.2em; }
-        @media (max-width: 768px) { h1 { font-size: 1.6em; } .char-container { grid-template-columns: repeat(auto-fill, minmax(50px, 1fr)); gap: 8px; } .char-item { font-size: 1.5em; } }
-    </style>
+        .controls { background: white; border-radius: 20px; padding: 25px; margin-bottom: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
+        .control-row { display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; }
+        .category-select { flex: 1; min-width: 200px; padding: 15px; font-size: 1.1em; border: 2px solid #e0e0e0; border-radius: 10px; background: white; cursor: pointer; }
+        .search-box { flex: 2; min-width: 250px; padding: 15px; font-size: 1.1em; border: 2px solid #e0e0e0; border-radius: 10px; }
+        .selected-chars { background: #f8f9fa; border: 2px dashed #667eea; border-radius: 10px; padding: 20px; min-height: 80px; font-size: 1.5em; word-wrap: break-word; margin-bottom: 15px; }
+        .selected-chars.empty { color: #999; font-size: 1em; display: flex; align-items: center; justify-content: center; }
+        .action-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn { padding: 12px 24px; font-size: 1em; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; transition: all 0.3s; }
+        .btn-copy { flex: 1; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .btn-copy:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4); }
+        .btn-clear { background: #e0e0e0; color: #666; }
+        .info-banner { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 15px 20px; border-radius: 15px; margin-bottom: 20px; text-align: center; font-weight: bold; }
+        .char-grid { background: white; border-radius: 20px; padding: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); min-height: 400px; }
+        .category-title { font-size: 1.5em; color: #333; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 3px solid #667eea; }
+        .char-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 10px; }
+        .char-item { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 2em; background: #f8f9fa; border: 2px solid #e0e0e0; border-radius: 10px; cursor: pointer; transition: all 0.2s; user-select: none; }
+        .char-item:hover { background: #667eea; color: white; transform: scale(1.1); border-color: #667eea; box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3); }
+        .copy-notice { position: fixed; top: 20px; right: 20px; background: #4CAF50; color: white; padding: 15px 25px; border-radius: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.3); z-index: 1000; display: none; }
+        .copy-notice.show { display: block; animation: slideIn 0.3s ease-out; }
+        @keyframes slideIn { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .loading { text-align: center; padding: 60px; color: #999; font-size: 1.2em; }
+        @media (max-width: 768px) { h1 { font-size: 1.6em; } .char-container { grid-template-columns: repeat(auto-fill, minmax(50px, 1fr)); gap: 8px; } .char-item { font-size: 1.5em; } }
+    </style>
 </head>
 <body>
-        <div class="menu-btn" id="menuBtn" onclick="toggleMenu()">
-        <span></span>
-        <span></span>
-        <span></span>
-    </div>
+    <div class="menu-btn" id="menuBtn" onclick="toggleMenu()">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
 
-        <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+    <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
 
-        <div class="side-menu" id="sideMenu">
-        <div class="menu-header">📚 메뉴</div>
-        <ul class="menu-list">
-            <li class="menu-item" onclick="goToPage('home')">
-                🏠 홈
-            </li>
-            <li class="menu-item" onclick="goToPage('font')">
-                🎨 폰트 변환기
-            </li>
-            <li class="menu-item" onclick="goToPage('unicode')">
-                🔧 특수문자 라이브러리
-            </li>
-            <li class="menu-item disabled">
-                📝 페이지 4 (준비중)
-            </li>
-            <li class="menu-item disabled">
-                ⚙️ 페이지 5 (준비중)
-            </li>
-            <li class="menu-item disabled">
-                ℹ️ 페이지 6 (준비중)
-            </li>
-        </ul>
-    </div>
+    <div class="side-menu" id="sideMenu">
+        <div class="menu-header">📚 메뉴</div>
+        <ul class="menu-list">
+            <li class="menu-item" onclick="goToPage('home')">
+                🏠 홈
+            </li>
+            <li class="menu-item" onclick="goToPage('font')">
+                🎨 폰트 변환기
+            </li>
+            <li class="menu-item" onclick="goToPage('unicode')">
+                🔧 특수문자 라이브러리
+            </li>
+            <li class="menu-item disabled">
+                📝 페이지 4 (준비중)
+            </li>
+            <li class="menu-item disabled">
+                ⚙️ 페이지 5 (준비중)
+            </li>
+            <li class="menu-item disabled">
+                ℹ️ 페이지 6 (준비중)
+            </li>
+        </ul>
+    </div>
 
-    <div class="container">
-        <header>
-            <h1>🔧 전문가용 특수문자 라이브러리</h1>
-            <p class="subtitle">클릭하여 특수문자를 선택하고 복사하세요</p>
-        </header>
-        <div class="controls">
-            <div class="control-row">
-                <select class="category-select" id="categorySelect" onchange="changeCategory()">
-                    <option value="">-- 카테고리 선택 --</option>
-                    <option value="popular">⭐ 인기 특수문자</option>
-                    <option value="arrows">➜ 화살표</option>
-                    <option value="stars">★ 별 & 하트</option>
-                    <option value="circles">● 동그라미 & 도형</option>
-                    <option value="math">± 수학 기호</option>
-                    <option value="emoji">😀 이모지</option>
-                    <option value="music">♪ 음악 기호</option>
-                    <option value="box">┌ 박스 그리기</option>
-                    <option value="check">✓ 체크 & 기호</option>
-                </select>
-                <input type="text" class="search-box" id="searchBox" placeholder="🔍 문자 검색..." oninput="searchChars()">
-            </div>
-            <div class="selected-chars empty" id="selectedChars">선택한 문자가 여기에 표시됩니다</div>
-            <div class="action-buttons">
-                <button class="btn btn-copy" onclick="copySelected()">📋 선택한 문자 복사하기</button>
-                <button class="btn btn-clear" onclick="clearSelected()">🗑️ 초기화</button>
-            </div>
-        </div>
-        <div class="info-banner">💡 팁: 문자를 클릭하면 선택됩니다. 여러 개를 선택한 후 한 번에 복사할 수 있어요!</div>
-        <div class="char-grid">
-            <div class="category-title" id="categoryTitle">카테고리를 선택하세요</div>
-            <div class="char-container" id="charContainer"><div class="loading">카테고리를 선택하면 특수문자가 표시됩니다</div></div>
-        </div>
-    </div>
-    <div class="copy-notice" id="copyNotice">✅ 클립보드에 복사되었습니다!</div>
-    <script>
-        const charData = {
-            popular: { title: '⭐ 인기 특수문자', chars: ['★','☆','♡','♥','❤','💕','💖','💗','✨','⭐','🌟','💫','✦','✧','✩','✪','♪','♫','♬','°','•','◦','○','●','◎','☀','☁','☂','☃','♀','♂','←','→','↑','↓','↔','✓','✔','✕','✖','✗','✘','⊕','⊖','⊗','⊙','∞','≈','≠','≤','≥','±','÷','×','√','∑','∫','∂','∆','∇','⌀','⌂','⌘','⌥','⏎','⏏','⏩','⏪','⏫','⏬','⏭','⏮','⏯','⏰','⏱','⏲','⏳'] },
-            arrows: { title: '➜ 화살표', chars: ['←','↑','→','↓','↔','↕','↖','↗','↘','↙','⇄','⇅','⇆','⇇','⇈','⇉','⇊','⇋','⇌','⇐','⇑','⇒','⇓','⇔','⇕','⟵','⟶','⟷','⟸','⟹','⟺','➔','➘','➙','➚','➛','➜','➝','➞','➟','➠','➡','➢','➣','➤','➥','➦','➧','➨','➩','➪','➫','➬','➭','➮','➯','➱','➲','➳','➴','➵','➶','➷','➸','➹','➺','➻','➼','➽','➾'] },
-            stars: { title: '★ 별 & 하트', chars: ['★','☆','✦','✧','✩','✪','✫','✬','✭','✮','✯','✰','⋆','✱','✲','✳','✴','✵','✶','✷','✸','✹','✺','✻','✼','✽','✾','✿','❀','❁','❂','❃','❄','❅','❆','❇','❈','❉','❊','❋','❖','♡','♥','❣','❤','❥','❦','❧','💕','💖','💗','💘','💙','💚','💛','💜','💝','💞','💟'] },
-            circles: { title: '● 동그라미 & 도형', chars: ['○','●','◎','◉','◌','◍','◐','◑','◒','◓','◔','◕','◖','◗','◘','◙','◚','◛','◜','◝','◞','◟','◠','◡','◢','◣','◤','◥','◦','◧','◨','◩','◪','◫','◬','◭','◮','◯','■','□','▢','▣','▤','▥','▦','▧','▨','▩','▪','▫','▬','▭','▮','▯','▰','▱','▲','△','▴','▵','▷','▸','▹','►','▻','▼','▽','▾','▿','◀','◁','◂','◃','◄','◅','◆','◇','◈','◊'] },
-            math: { title: '± 수학 기호', chars: ['+','−','×','÷','=','≠','≈','≡','≤','≥','<','>','±','∓','∞','∫','∑','∏','√','∛','∜','∂','∆','∇','∈','∉','∋','∌','∩','∪','⊂','⊃','⊄','⊅','⊆','⊇','⊕','⊖','⊗','⊘','⊙','⊚','⊛','⊜','⊝','⊞','⊟','⊠','⊡','⊢','⊣','⊤','⊥','∀','∁','∃','∄','∅','∝','∟','∠','∡','∢','∧','∨','∴','∵','∼','∽','∾','∿','≀','≁','≂','≃','≄','≅','≆','≇','≉','≊','≋','≌','≍','≎','≏'] },
-            emoji: { title: '😀 이모지', chars: ['😀','😁','😂','😃','😄','😅','😆','😇','😈','😉','😊','😋','😌','😍','😎','😏','😐','😑','😒','😓','😔','😕','😖','😗','😘','😙','😚','😛','😜','😝','😞','😟','😠','😡','😢','😣','😤','😥','😦','😧','😨','😩','😪','😫','😬','😭','😮','😯','😰','😱','😲','😳','😴','😵','😶','😷','🙁','🙂','🙃','🙄','🤐','🤑','🤒','🤓','🤔','🤕','🤗','🤠','🤡','🤢','🤣','🤤','🤥','🤧','🤨','🤩','🤪','🤫','🤬','🤭','🤮','🤯','🥰','🥱','🥲','🥳','🥴','🥵','🥶','🥺'] },
-            music: { title: '♪ 음악 기호', chars: ['♩','♪','♫','♬','♭','♮','♯','𝄀','𝄁','𝄂','𝄃','𝄄','𝄅','𝄆','𝄇','𝄈','𝄉','𝄊','𝄋','𝄌','𝄍','𝄎','𝄏','𝄐','𝄑','𝄒','𝄓','𝄔','𝄕','𝄖','𝄗','𝄘','𝄙','𝄚','𝄛','𝄜','𝄝','𝄞','𝄟','𝄠','𝄡','𝄢','𝄣','𝄤','𝄥','𝄦','𝄩','𝄪','𝄫'] },
-            box: { title: '┌ 박스 그리기', chars: ['─','━','│','┃','┄','┅','┆','┇','┈','┉','┊','┋','┌','┍','┎','┏','┐','┑','┒','┓','└','┕','┖','┗','┘','┙','┚','┛','├','┝','┞','┟','┠','┡','┢','┣','┤','┥','┦','┧','┨','┩','┪','┫','┬','┭','┮','┯','┰','┱','┲','┳','┴','┵','┶','┷','┸','┹','┺','┻','┼','┽','┾','┿','╀','╁','╂','╃','╄','╅','╆','╇','╈','╉','╊','╋','╌','╍','╎','╏','═','║','╒','╓','╔','╕','╖','╗','╘','╙','╚','╛','╜','╝','╞','╟','╠','╡','╢','╣','╤','╥','╦','╧','╨','╩','╪','╫','╬','╭','╮','╯','╰','╱','╲','╳'] },
-            check: { title: '✓ 체크 & 기호', chars: ['✓','✔','✕','✖','✗','✘','☐','☑','☒','○','◉','◎','●','◐','◑','◒','◓','◔','◕','☓','⊗','⊘','⊙','⊚','⊛','⊜','⊝','⊞','⊟','⊠','⊡','⊢','⊣','⊤','⊥','⊦','⊧','⊨','⊩','⊪','⊫','⊬','⊭','⊮','⊯'] }
-        };
-        let selectedText = '';
-        function changeCategory() {
-            const select = document.getElementById('categorySelect');
-            const category = select.value;
-            if (!category) {
-                document.getElementById('charContainer').innerHTML = '<div class="loading">카테고리를 선택하면 특수문자가 표시됩니다</div>';
-                document.getElementById('categoryTitle').textContent = '카테고리를 선택하세요';
-                return;
-            }
-            const data = charData[category];
-            document.getElementById('categoryTitle').textContent = data.title;
-            const container = document.getElementById('charContainer');
-            container.innerHTML = '';
-            data.chars.forEach(char => {
-                const item = document.createElement('div');
-                item.className = 'char-item';
-                item.textContent = char;
-                item.onclick = () => selectChar(char);
-                container.appendChild(item);
-            });
-        }
-        function selectChar(char) { selectedText += char; updateSelectedDisplay(); }
-        function updateSelectedDisplay() {
-            const display = document.getElementById('selectedChars');
-            if (selectedText) { display.textContent = selectedText; display.classList.remove('empty'); }
-            else { display.textContent = '선택한 문자가 여기에 표시됩니다'; display.classList.add('empty'); }
-        }
-        function copySelected() {
-            if (!selectedText) { alert('복사할 문자를 먼저 선택하세요!'); return; }
-            navigator.clipboard.writeText(selectedText).then(() => showCopyNotice()).catch(() => {
-                const textarea = document.createElement('textarea');
-                textarea.value = selectedText;
-                document.body.appendChild(textarea);
-                textarea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textarea);
-                showCopyNotice();
-            });
-        }
-        function clearSelected() { selectedText = ''; updateSelectedDisplay(); }
-        function showCopyNotice() {
-            const notice = document.getElementById('copyNotice');
-            notice.classList.add('show');
-            setTimeout(() => notice.classList.remove('show'), 2000);
-        }
-        function searchChars() {
-            const searchTerm = document.getElementById('searchBox').value.toLowerCase();
-            const items = document.querySelectorAll('.char-item');
-            items.forEach(item => {
-                if (searchTerm === '' || item.textContent.includes(searchTerm)) item.style.display = 'flex';
-                else item.style.display = 'none';
-            });
-        }
-        
-        // 메뉴 토글
-        function toggleMenu() {
-            const menu = document.getElementById('sideMenu');
-            const overlay = document.getElementById('overlay');
-            const btn = document.getElementById('menuBtn');
-            
-            menu.classList.toggle('open');
-            overlay.classList.toggle('show');
-            btn.classList.toggle('active');
-        }
-        
-        // 페이지 이동 (링크 업데이트 완료)
-        function goToPage(page) {
-            const links = {
-                'home': '/', // 홈 페이지 링크
-                // ✅ 폰트 변환기 링크 설정
-                'font': 'https://guard6.github.io/unicode-tool-index.html/', 
-                // 현재 페이지이므로 'current'로 설정
-                'unicode': 'current', 
-            };
-            
-            if (links[page]) {
-                if (links[page] === 'current') {
-                    alert('현재 ' + page + ' 페이지입니다.');
-                } else {
-                    window.location.href = links[page]; // 해당 링크로 이동
-                }
-            } else {
+    <div class="container">
+        <header>
+            <h1>🔧 전문가용 특수문자 라이브러리</h1>
+            <p class="subtitle">클릭하여 특수문자를 선택하고 복사하세요</p>
+        </header>
+        <div class="controls">
+            <div class="control-row">
+                <select class="category-select" id="categorySelect" onchange="changeCategory()">
+                    <option value="">-- 카테고리 선택 --</option>
+                    <option value="popular">⭐ 인기 특수문자</option>
+                    <option value="arrows">➜ 화살표</option>
+                    <option value="stars">★ 별 & 하트</option>
+                    <option value="circles">● 동그라미 & 도형</option>
+                    <option value="math">± 수학 기호</option>
+                    <option value="emoji">😀 이모지</option>
+                    <option value="music">♪ 음악 기호</option>
+                    <option value="box">┌ 박스 그리기</option>
+                    <option value="check">✓ 체크 & 기호</option>
+                </select>
+                <input type="text" class="search-box" id="searchBox" placeholder="🔍 문자 검색..." oninput="searchChars()">
+            </div>
+            <div class="selected-chars empty" id="selectedChars">선택한 문자가 여기에 표시됩니다</div>
+            <div class="action-buttons">
+                <button class="btn btn-copy" onclick="copySelected()">📋 선택한 문자 복사하기</button>
+                <button class="btn btn-clear" onclick="clearSelected()">🗑️ 초기화</button>
+            </div>
+        </div>
+        <div class="info-banner">💡 팁: 문자를 클릭하면 선택됩니다. 여러 개를 선택한 후 한 번에 복사할 수 있어요!</div>
+        <div class="char-grid">
+            <div class="category-title" id="categoryTitle">카테고리를 선택하세요</div>
+            <div class="char-container" id="charContainer"><div class="loading">카테고리를 선택하면 특수문자가 표시됩니다</div></div>
+        </div>
+    </div>
+    <div class="copy-notice" id="copyNotice">✅ 클립보드에 복사되었습니다!</div>
+    <script>
+        const charData = {
+            popular: { title: '⭐ 인기 특수문자', chars: ['★','☆','♡','♥','❤','💕','💖','💗','✨','⭐','🌟','💫','✦','✧','✩','✪','♪','♫','♬','°','•','◦','○','●','◎','☀','☁','☂','☃','♀','♂','←','→','↑','↓','↔','✓','✔','✕','✖','✗','✘','⊕','⊖','⊗','⊙','∞','≈','≠','≤','≥','±','÷','×','√','∑','∫','∂','∆','∇','⌀','⌂','⌘','⌥','⏎','⏏','⏩','⏪','⏫','⏬','⏭','⏮','⏯','⏰','⏱','⏲','⏳'] },
+            arrows: { title: '➜ 화살표', chars: ['←','↑','→','↓','↔','↕','↖','↗','↘','↙','⇄','⇅','⇆','⇇','⇈','⇉','⇊','⇋','⇌','⇐','⇑','⇒','⇓','⇔','⇕','⟵','⟶','⟷','⟸','⟹','⟺','➔','➘','➙','➚','➛','➜','➝','➞','➟','➠','➡','➢','➣','➤','➥','➦','➧','➨','➩','➪','➫','➬','➭','➮','➯','➱','➲','➳','➴','➵','➶','➷','➸','➹','➺','➻','➼','➽','➾'] },
+            stars: { title: '★ 별 & 하트', chars: ['★','☆','✦','✧','✩','✪','✫','✬','✭','✮','✯','✰','⋆','✱','✲','✳','✴','✵','✶','✷','✸','✹','✺','✻','✼','✽','✾','✿','❀','❁','❂','❃','❄','❅','❆','❇','❈','❉','❊','❋','❖','♡','♥','❣','❤','❥','❦','❧','💕','💖','💗','💘','💙','💚','💛','💜','💝','💞','💟'] },
+            circles: { title: '● 동그라미 & 도형', chars: ['○','●','◎','◉','◌','◍','◐','◑','◒','◓','◔','◕','◖','◗','◘','◙','◚','◛','◜','◝','◞','◟','◠','◡','◢','◣','◤','◥','◦','◧','◨','◩','◪','◫','◬','◭','◮','◯','■','□','▢','▣','▤','▥','▦','▧','▨','▩','▪','▫','▬','▭','▮','▯','▰','▱','▲','△','▴','▵','▷','▸','▹','►','▻','▼','▽','▾','▿','◀','◁','◂','◃','◄','◅','◆','◇','◈','◊'] },
+            math: { title: '± 수학 기호', chars: ['+','−','×','÷','=','≠','≈','≡','≤','≥','<','>','±','∓','∞','∫','∑','∏','√','∛','∜','∂','∆','∇','∈','∉','∋','∌','∩','∪','⊂','⊃','⊄','⊅','⊆','⊇','⊕','⊖','⊗','⊘','⊙','⊚','⊛','⊜','⊝','⊞','⊟','⊠','⊡','⊢','⊣','⊤','⊥','∀','∁','∃','∄','∅','∝','∟','∠','∡','∢','∧','∨','∴','∵','∼','∽','∾','∿','≀','≁','≂','≃','≄','≅','≆','≇','≉','≊','≋','≌','≍','≎','≏'] },
+            emoji: { title: '😀 이모지', chars: ['😀','😁','😂','😃','😄','😅','😆','😇','😈','😉','😊','😋','😌','😍','😎','😏','😐','😑','😒','😓','😔','😕','😖','😗','😘','😙','😚','😛','😜','😝','😞','😟','😠','😡','😢','😣','😤','😥','😦','😧','😨','😩','😪','😫','😬','😭','😮','😯','😰','😱','😲','😳','😴','😵','😶','😷','🙁','🙂','🙃','🙄','🤐','🤑','🤒','🤓','🤔','🤕','🤗','🤠','🤡','🤢','🤣','🤤','🤥','🤧','🤨','🤩','🤪','🤫','🤬','🤭','🤮','🤯','🥰','🥱','🥲','🥳','🥴','🥵','🥶','🥺'] },
+            music: { title: '♪ 음악 기호', chars: ['♩','♪','♫','♬','♭','♮','♯','𝄀','𝄁','𝄂','𝄃','𝄄','𝄅','𝄆','𝄇','𝄈','𝄉','𝄊','𝄋','𝄌','𝄍','𝄎','𝄏','𝄐','𝄑','𝄒','𝄓','𝄔','𝄕','𝄖','𝄗','𝄘','𝄙','𝄚','𝄛','𝄜','𝄝','𝄞','𝄟','𝄠','𝄡','𝄢','𝄣','𝄤','𝄥','𝄦','𝄩','𝄪','𝄫'] },
+            box: { title: '┌ 박스 그리기', chars: ['─','━','│','┃','┄','┅','┆','┇','┈','┉','┊','┋','┌','┍','┎','┏','┐','┑','┒','┓','└','┕','┖','┗','┘','┙','┚','┛','├','┝','┞','┟','┠','┡','┢','┣','┤','┥','┦','┧','┨','┩','┪','┫','┬','┭','┮','┯','┰','┱','┲','┳','┴','┵','┶','┷','┸','┹','┺','┻','┼','┽','┾','┿','╀','╁','╂','╃','╄','╅','╆','╇','╈','╉','╊','╋','╌','╍','╎','╏','═','║','╒','╓','╔','╕','╖','╗','╘','╙','╚','╛','╜','╝','╞','╟','╠','╡','╢','╣','╤','╥','╦','╧','╨','╩','╪','╫','╬','╭','╮','╯','╰','╱','╲','╳'] },
+            check: { title: '✓ 체크 & 기호', chars: ['✓','✔','✕','✖','✗','✘','☐','☑','☒','○','◉','◎','●','◐','◑','◒','◓','◔','◕','☓','⊗','⊘','⊙','⊚','⊛','⊜','⊝','⊞','⊟','⊠','⊡','⊢','⊣','⊤','⊥','⊦','⊧','⊨','⊩','⊪','⊫','⊬','⊭','⊮','⊯'] }
+        };
+        let selectedText = '';
+        function changeCategory() {
+            const select = document.getElementById('categorySelect');
+            const category = select.value;
+            if (!category) {
+                document.getElementById('charContainer').innerHTML = '<div class="loading">카테고리를 선택하면 특수문자가 표시됩니다</div>';
+                document.getElementById('categoryTitle').textContent = '카테고리를 선택하세요';
+                return;
+            }
+            const data = charData[category];
+            document.getElementById('categoryTitle').textContent = data.title;
+            const container = document.getElementById('charContainer');
+            container.innerHTML = '';
+            data.chars.forEach(char => {
+                const item = document.createElement('div');
+                item.className = 'char-item';
+                item.textContent = char;
+                item.onclick = () => selectChar(char);
+                container.appendChild(item);
+            });
+        }
+        function selectChar(char) { selectedText += char; updateSelectedDisplay(); }
+        function updateSelectedDisplay() {
+            const display = document.getElementById('selectedChars');
+            if (selectedText) { display.textContent = selectedText; display.classList.remove('empty'); }
+            else { display.textContent = '선택한 문자가 여기에 표시됩니다'; display.classList.add('empty'); }
+        }
+        function copySelected() {
+            if (!selectedText) { alert('복사할 문자를 먼저 선택하세요!'); return; }
+            navigator.clipboard.writeText(selectedText).then(() => showCopyNotice()).catch(() => {
+                const textarea = document.createElement('textarea');
+                textarea.value = selectedText;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                showCopyNotice();
+            });
+        }
+        function clearSelected() { selectedText = ''; updateSelectedDisplay(); }
+        function showCopyNotice() {
+            const notice = document.getElementById('copyNotice');
+            notice.classList.add('show');
+            setTimeout(() => notice.classList.remove('show'), 2000);
+        }
+        function searchChars() {
+            const searchTerm = document.getElementById('searchBox').value.toLowerCase();
+            const items = document.querySelectorAll('.char-item');
+            items.forEach(item => {
+                if (searchTerm === '' || item.textContent.includes(searchTerm)) item.style.display = 'flex';
+                else item.style.display = 'none';
+            });
+        }
+        
+        // 메뉴 토글
+        function toggleMenu() {
+            const menu = document.getElementById('sideMenu');
+            const overlay = document.getElementById('overlay');
+            const btn = document.getElementById('menuBtn');
+            
+            menu.classList.toggle('open');
+            overlay.classList.toggle('show');
+            btn.classList.toggle('active');
+        }
+        
+        // 페이지 이동 (링크 설정 완료)
+        function goToPage(page) {
+            const links = {
+                'home': '/', // 홈 페이지 링크
+                // ✅ 폰트 변환기 링크 설정
+                'font': 'https://guard6.github.io/unicode-tool-index.html/', 
+                // 현재 페이지이므로 'current'로 설정
+                'unicode': 'current', 
+            };
+            
+            if (links[page]) {
+                if (links[page] === 'current') {
+                    // 현재 페이지일 경우 메뉴만 닫고 알림
+                    alert('현재 ' + page + ' 페이지입니다.');
+                } else {
+                    // 다른 페이지로 이동
+                    window.location.href = links[page]; 
+                    return; // 페이지 이동 시 함수 종료
+                }
+            } else {
+                // 준비중인 페이지
                 alert('페이지 이동: ' + page + '\n\n아직 링크가 설정되지 않은 페이지입니다.');
             }
-            toggleMenu(); // 메뉴 닫기
-        }
-    </script>
+            toggleMenu(); // 메뉴 닫기
+        }
+    </script>
 </body>
 </html>
