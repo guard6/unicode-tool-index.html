@@ -7,6 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        /* 배경색 및 기본 설정 복구 */
         body { font-family: 'Noto Sans KR', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
         .container { max-width: 1400px; margin: 0 auto; }
         
@@ -35,6 +36,7 @@
         header { text-align: center; color: white; margin-bottom: 30px; padding: 20px; }
         h1 { font-size: 2.2em; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
         .subtitle { font-size: 1em; opacity: 0.9; }
+        /* UI 요소 배경 복구 */
         .controls { background: white; border-radius: 20px; padding: 25px; margin-bottom: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
         .control-row { display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; }
         .category-select { flex: 1; min-width: 200px; padding: 15px; font-size: 1.1em; border: 2px solid #e0e0e0; border-radius: 10px; background: white; cursor: pointer; }
@@ -203,14 +205,13 @@
             btn.classList.toggle('active');
         }
         
-        // 페이지 이동 (링크 업데이트됨)
+        // 페이지 이동 (링크 업데이트 완료)
         function goToPage(page) {
-            // TODO: 여기에 각 페이지 링크를 추가하세요
             const links = {
                 'home': '/', // 홈 페이지 링크
                 // ✅ 폰트 변환기 링크 설정
                 'font': 'https://guard6.github.io/unicode-tool-index.html/', 
-                // 현재 페이지이므로 'current'로 설정하여 이동 방지
+                // 현재 페이지이므로 'current'로 설정
                 'unicode': 'current', 
             };
             
