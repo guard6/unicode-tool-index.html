@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>오픈프로필 완전 자동 안내 시스템 (최종 개선 버전)</title>
+    <style>
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        /* 1. 기본 UI 및 레이아웃 스타일 */
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        * { box-sizing: border-box; }
+        
+        body { 
+            margin: 0; 
+            padding: 0; 
+            background-color: #f7f7f7; 
+            font-family: 'Malgun Gothic', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        
+        .kakao-screen { 
+            max-width: 400px; 
+            margin: 0 auto; 
+            background-color: white; 
+            min-height: 100vh; 
+            position: relative; 
+            display: flex; 
+            flex-direction: column;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        .status-bar { 
+            background-color: white; 
+            padding: 6px 15px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            font-size: 0.85em; 
+            color: #333;
+            border-bottom: 1px solid #e8e8e8;
+        }
+        
+        .main-header { 
+            padding: 10px 15px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            background-color: white; 
+            border-bottom: 1px solid #e8e8e8; 
+        }
+        
+        .main-header h1 { 
+            margin: 0; 
+            font-size: 1.6em; 
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+        
+        .header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            background-color: white; 
+            padding: 15px; 
+            font-size: 1.1em; 
+            font-weight: 600;
+            border-bottom: 1px solid #e8e8e8; 
+        }
+        
+        .tab-buttons { 
+            display: flex; 
+            padding: 8px 15px; 
+            background-color: white; 
+            gap: 5px;
+        }
+        
+        .tab { 
+            padding: 6px 14px; 
+            border-radius: 20px; 
+            font-size: 0.9em; 
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        
+        .tab-default { 
+            background-color: #f0f0f0; 
+            color: #555; 
+        }
+        
+        .tab-openchat { 
+            background-color: #333; 
+            color: white; 
+        }
+        
+        .tab-badge { 
+            background-color: red; 
+            color: white; 
+            border-radius: 50%; 
+            padding: 2px 6px; 
+            font-size: 0.65em; 
+            margin-left: 5px;
+            font-weight: 700;
+        }
+        
+        .ad-banner { 
+            padding: 15px; 
+            display: flex; 
+            align-items: center; 
+            border-bottom: 1px solid #f0f0f0; 
+            background-color: white; 
+            gap: 10px;
+        }
+        
+        .ad-text { 
+            font-size: 0.9em; 
+        }
+        
+        .ad-text strong { 
+            display: block;
+            font-weight: 600;
+        }
+        
+        .chat-list { 
+            flex-grow: 1;
+            background-color: white;
+            overflow-y: auto;
+        }
+
+        .chat-item {
+            padding: 12px 15px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #f5f5f5;
+            gap: 10px;
+        }
+
+        .chat-item-thumbnail {
+            width: 50px;
+            height: 50px;
+            background-color: #f0f0f0;
+            border-radius: 8px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            font-size: 1.2em;
+        }
+
+        .chat-item-content {
+            flex-grow: 1;
+            min-width: 0;
+        }
+
+        .chat-item-title {
+            font-weight: 600;
+            font-size: 0.95em;
+            color: #333;
+            margin-bottom: 3px;
+        }
+
+        .chat-item-preview {
+            font-size: 0.85em;
+            color: #888;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        /* popup-item-disabled: 비활성화된 팝업 항목 스타일 정의 */
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        .popup-item-disabled {
+            opacity: 0.6;
+        }
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        /* 2. 단계 전환 및 애니메이션 스타일 */
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        .step { 
+            display: none; 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            right: 0; 
+            bottom: 0; 
+            background-color: white; 
+            flex-direction: column; 
+            min-height: 100vh;
+            width: 100%;
+            z-index: 1;
+        }
+        
+        .step.active { 
+            display: flex;
+            z-index: 10;
+        }
+        
+        .instruction-bar { 
+            background-color: #fff9e6; 
+            color: #8b6f47; 
+            padding: 12px 15px; 
+            font-weight: 600; 
+            text-align: center; 
+            border-bottom: 2px solid #ffe082; 
+            position: relative;
+            font-size: 0.95em;
+            line-height: 1.4;
+        }
+
+        /* 부드러운 텍스트 강조 애니메이션 */
+        @keyframes pulse-text {
+            0% { 
+                color: #ff9800; 
+                transform: scale(1);
+                text-shadow: 0 0 0px rgba(255, 152, 0, 0);
+            }
+            50% { 
+                color: #ffb74d; 
+                transform: scale(1.03);
+                text-shadow: 0 0 6px rgba(255, 152, 0, 0.4);
+            }
+            100% { 
+                color: #ff9800; 
+                transform: scale(1);
+                text-shadow: 0 0 0px rgba(255, 152, 0, 0);
+            }
+        }
+
+        @keyframes pulse-icon {
+            0% { 
+                color: #ffc107;
+                filter: drop-shadow(0 0 0px rgba(255, 193, 7, 0));
+            }
+            50% { 
+                color: #ffeb3b;
+                filter: drop-shadow(0 0 4px rgba(255, 193, 7, 0.6));
+            }
+            100% { 
+                color: #ffc107;
+                filter: drop-shadow(0 0 0px rgba(255, 193, 7, 0));
+            }
+        }
+
+        .highlight-text, .highlight-icon {
+            cursor: pointer; /* 클릭 가능한 요소임을 명시 */
+        }
+
+        .highlight-text {
+            animation: pulse-text 1.6s ease-in-out infinite;
+            display: inline-block;
+            font-weight: 600;
+        }
+
+        .highlight-icon {
+            animation: pulse-icon 1.6s ease-in-out infinite;
+            display: inline-block;
+        }
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        /* 3. STEP별 전용 스타일 */
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        
+        #step-1 .main-header-icons { 
+            display: flex; 
+            align-items: center;
+            gap: 5px;
+        }
+        
+        #step-2 .popup-overlay { 
+            background-color: rgba(0, 0, 0, 0.55); 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            right: 0; 
+            bottom: 0;
+            display: flex; 
+            flex-direction: column; 
+            justify-content: flex-end;
+            z-index: 5;
+            /* 배경 블러 효과 추가 */
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+        
+        #step-2 .popup-content { 
+            background-color: white; 
+            padding-bottom: 15px; 
+            border-top-left-radius: 16px; 
+            border-top-right-radius: 16px; 
+            width: 100%;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        
+        #step-2 .popup-item { 
+            padding: 14px 15px; 
+            display: flex; 
+            align-items: center; 
+            border-bottom: 1px solid #f5f5f5; 
+            position: relative;
+            cursor: pointer;
+        }
+
+        #step-3 .open-profile-cards { 
+            display: flex; 
+            flex-wrap: wrap; 
+            padding: 0 15px;
+            gap: 8px;
+        }
+        
+        #step-3 .open-profile-card { 
+            width: calc(33.333% - 6px); 
+            aspect-ratio: 1;
+            background-color: #f5f5f5; 
+            border-radius: 10px; 
+        }
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        /* 4. 완료 화면 스타일 */
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        .completion-message {
+            flex-grow: 1;
+            padding: 40px 20px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #555;
+        }
+
+        .completion-message .emoji {
+            font-size: 3em;
+            margin-bottom: 20px;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .completion-message h2 {
+            font-size: 1.4em;
+            font-weight: 600;
+            margin: 0 0 15px 0;
+            color: #333;
+        }
+
+        .completion-message p {
+            margin: 8px 0;
+            line-height: 1.6;
+            font-size: 0.95em;
+        }
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        /* 5. 인터액티브 요소 스타일 (만들기 버튼 및 복사 버튼) */
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        .create-button {
+            /* Step 3의 만들기 버튼 스타일 */
+            padding: 5px 10px;
+            border-radius: 6px;
+            background-color: #ffe644; /* 카카오 노란색 */
+            color: #333;
+            font-weight: 700;
+            font-size: 0.9em;
+            cursor: pointer;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            /* 애니메이션 적용 대상 클래스 */
+        }
+        
+        .copy-button {
+            /* Step 4의 복사 버튼 스타일 */
+            background-color: #2196F3;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s, transform 0.1s;
+        }
+
+        .copy-button:active {
+            transform: scale(0.98);
+        }
+    </style>
+</head>
+<body>
+    <div class="kakao-screen">
+        <div id="step-1" class="step active">
+            <div class="status-bar">
+                <span id="current-time">11:23</span>
+                <div>
+                    <span id="battery-level" style="margin-right: 4px;">100%</span>
+                    <span id="battery-icon">🔋</span>
+                    <span style="margin-left: 8px;">📶</span>
+                </div>
+            </div>
+            
+            <div class="main-header">
+                <h1>지금</h1>
+                <div class="main-header-icons">
+                    <span style="font-size: 1.2em; color:#666;">🔍</span>
+                    <span id="step1-target" class="highlight-icon" style="font-size: 1.2em; cursor: pointer;">💬</span>
+                    <span style="font-size: 1.2em; color:#666;">⚙️</span>
+                </div>
+            </div>
+            
+            <div class="instruction-bar">
+                ➡️ <strong>1/4 단계:</strong> 우측 상단의 <span class="highlight-text">오픈채팅 아이콘</span>을 선택합니다.
+            </div>
+            
+            <div class="tab-buttons">
+                <div class="tab tab-default">쇼핑</div>
+                <div class="tab tab-openchat">오픈채팅 <span class="tab-badge">999+</span></div>
+            </div>
+            
+            <div class="ad-banner">
+                <div>
+                    <div style="width: 50px; height: 50px; background-color: #333; border-radius: 8px;"></div>
+                </div>
+                <div class="ad-text">
+                    <small style="color:#ff6b6b; font-weight:700;">광고</small>
+                    <strong>게임 광고 타이틀</strong>
+                    <small style="color: #999;">자세히</small>
+                </div>
+            </div>
+            
+            <div class="chat-item">
+                <div class="chat-item-thumbnail" style="background-color: #FF6B9D;">
+                    CP
+                </div>
+                <div class="chat-item-content">
+                    <div class="chat-item-title">CP 소통방</div>
+                    <div class="chat-item-preview">최신 정보를 빠르게 받아보세요</div>
+                </div>
+            </div>
+            
+            <div class="chat-list">
+                <div class="chat-item">
+                    <div class="chat-item-thumbnail" style="background-color: #4CAF50;">
+                        A
+                    </div>
+                    <div class="chat-item-content">
+                        <div class="chat-item-title">채팅방 A</div>
+                        <div class="chat-item-preview">안녕하세요!</div>
+                    </div>
+                </div>
+                
+                <div class="chat-item">
+                    <div class="chat-item-thumbnail" style="background-color: #FF9800;">
+                        B
+                    </div>
+                    <div class="chat-item-content">
+                        <div class="chat-item-title">채팅방 B</div>
+                        <div class="chat-item-preview">좋은 소식이 있어요</div>
+                    </div>
+                </div>
+                
+                <div class="chat-item">
+                    <div class="chat-item-thumbnail" style="background-color: #2196F3;">
+                        C
+                    </div>
+                    <div class="chat-item-content">
+                        <div class="chat-item-title">채팅방 C</div>
+                        <div class="chat-item-preview">오늘 회의는 어때요?</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="step-2" class="step">
+            <div class="status-bar">
+                <span id="current-time-2">11:23</span>
+                <div>
+                    <span id="battery-level-2" style="margin-right: 4px;">100%</span>
+                    <span id="battery-icon-2">🔋</span>
+                    <span style="margin-left: 8px;">📶</span>
+                </div>
+            </div>
+            
+            <div class="main-header" style="background-color: transparent; border-bottom: none; position: relative; z-index: 8;">
+                <h1>지금</h1>
+                <div class="main-header-icons">
+                    <span style="font-size: 1.2em; color:#666;">🔍</span>
+                    <span style="font-size: 1.2em; color:#ffc107;">💬</span>
+                    <span style="font-size: 1.2em; color:#666;">⚙️</span>
+                </div>
+            </div>
+            
+            <div style="flex-grow: 1; position: relative; z-index: 4;"></div>
+
+            <div class="popup-overlay">
+                <div class="instruction-bar" style="background-color: transparent; color: white; border-bottom: none; text-shadow: 0 1px 3px rgba(0,0,0,0.2); position: relative; z-index: 6;">
+                    ➡️ <strong>2/4 단계:</strong> 하단의 <span class="highlight-text" style="text-shadow: 0 0 0px rgba(255, 152, 0, 0);">오픈프로필</span> 항목을 선택합니다.
+                </div>
+                
+                <div class="popup-content">
+                    <div style="padding: 15px; text-align: center; font-weight: 600; border-bottom: 1px solid #f0f0f0; font-size: 0.95em;">오픈채팅 만들기</div>
+                    
+                    <div class="popup-item popup-item-disabled">
+                        <div style="width: 35px; height: 35px; background-color: #9C27B0; border-radius: 50%; flex-shrink: 0; margin-right: 12px;"></div>
+                        <div>
+                            <div style="font-weight: 600; font-size: 0.95em;">그룹채팅</div>
+                            <div style="font-size: 0.8em; color: #888; margin-top: 2px;">친구들과 함께 대화하세요.</div>
+                        </div>
+                    </div>
+
+                    <div class="popup-item popup-item-disabled">
+                        <div style="width: 35px; height: 35px; background-color: #FF5722; border-radius: 50%; flex-shrink: 0; margin-right: 12px;"></div>
+                        <div>
+                            <div style="font-weight: 600; font-size: 0.95em;">커뮤니티</div>
+                            <div style="font-size: 0.8em; color: #888; margin-top: 2px;">관심사가 같은 사람들을 만나세요.</div>
+                        </div>
+                    </div>
+
+                    <div class="popup-item popup-item-disabled">
+                        <div style="width: 35px; height: 35px; background-color: #3F51B5; border-radius: 50%; flex-shrink: 0; margin-right: 12px;"></div>
+                        <div>
+                            <div style="font-weight: 600; font-size: 0.95em;">1:1 채팅</div>
+                            <div style="font-size: 0.8em; color: #888; margin-top: 2px;">개인적으로 대화하세요.</div>
+                        </div>
+                    </div>
+                    
+                    <div id="step2-target" class="popup-item" style="position: relative; background-color: #fffbf0; border-bottom: none;">
+                        <div style="width: 35px; height: 35px; background-color: #ffe644; border-radius: 50%; flex-shrink: 0; margin-right: 12px;"></div>
+                        <div>
+                            <div class="highlight-text" style="font-weight: 600; font-size: 0.95em; animation-duration: 2s;">오픈프로필</div>
+                            <div style="font-size: 0.8em; color: #888; margin-top: 2px;">오픈채팅에서 쓸 맞춤 프로필을 만들어요.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="step-3" class="step">
+            <div class="status-bar">
+                <span id="current-time-3">11:23</span>
+                <div>
+                    <span id="battery-level-3" style="margin-right: 4px;">100%</span>
+                    <span id="battery-icon-3">🔋</span>
+                    <span style="margin-left: 8px;">📶</span>
+                </div>
+            </div>
+            
+            <div class="header">
+                <span style="font-size: 1.2em; color: #999; cursor: pointer;">×</span>
+                <span>나의 오픈채팅</span>
+                <span></span>
+            </div>
+            
+            <div class="instruction-bar">
+                ➡️ <strong>3/4 단계:</strong> 우측 상단의 <span class="highlight-text">'만들기'</span> 버튼을 선택합니다.
+            </div>
+            
+            <div style="font-size: 0.95em; font-weight: 600; padding: 15px 15px 10px 15px; color: #666;">
+                나의 채팅방 14
+            </div>
+            
+            <div class="open-profile-cards" style="margin-bottom: 15px;">
+                <div class="open-profile-card" style="background-color: #d2a450;"></div>
+                <div class="open-profile-card" style="background-color: #c95b64;"></div>
+                <div class="open-profile-card" style="background-color: #4b82ac;"></div>
+            </div>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px;">
+                <span style="font-size: 0.95em; font-weight: 600; color: #666;">나의 오픈프로필 3</span>
+                <span id="step3-target" class="create-button highlight-text" style="animation-duration: 1.8s;">만들기</span>
+            </div>
+
+            <div class="open-profile-cards" style="flex-grow: 1; padding-bottom: 20px;">
+                <div class="open-profile-card" style="background-color: #8be0ff;"></div>
+                <div class="open-profile-card"></div>
+                <div class="open-profile-card"></div>
+            </div>
+        </div>
+
+        <div id="step-4" class="step">
+            <div class="status-bar">
+                <span id="current-time-4">11:23</span>
+                <div>
+                    <span id="battery-level-4" style="margin-right: 4px;">100%</span>
+                    <span id="battery-icon-4">🔋</span>
+                    <span style="margin-left: 8px;">📶</span>
+                </div>
+            </div>
+            
+            <div class="header">오픈프로필 설정</div>
+            
+            <div class="instruction-bar" style="background-color: #e8f5e9; color: #2e7d32; border-bottom: 2px solid #c8e6c9;">
+                ✅ <strong>안내 완료 (4/4)</strong><br>
+                이제 실제 카카오톡에서 <strong>'만들기'</strong> 버튼을 눌러 마무리하세요!
+            </div>
+            
+            <div class="completion-message">
+                <div class="emoji">🎉</div>
+                <h2>안내가 완료되었습니다!</h2>
+                <p>이 화면은 자동으로 멈춥니다.</p>
+                <button id="copy-link-button" class="copy-button">
+                    🔗 프로필 링크 복사
+                </button>
+                <p style="margin-top: 15px; font-size: 0.9em; color: #999;">
+                    안내된 방법대로 따라 하면<br>
+                    오픈 프로필 생성을 완료할 수 있습니다.
+                </p>
+                <div style="font-size: 2.5em; margin-top: 20px;">✨</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        // 설정 및 상태 관리
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+        const CONFIG = {
+            autoPlay: true,           // 자동 진행 여부
+            stepDuration: 3500,       // 기본 단계별 시간 (ms)
+            allowSkip: true,          // 사용자 클릭으로 건너뛰기 가능
+            debug: false              // 디버그 로그 출력 (최종 버전에서는 false 권장)
+        };
+
+        const STEPS = [
+            { id: 'step-1', duration: 3500, targetId: 'step1-target' },
+            { id: 'step-2', duration: 3500, targetId: 'step2-target' },
+            { id: 'step-3', duration: 3500, targetId: 'step3-target' },
+            { id: 'step-4', duration: 0, targetId: null }
+        ];
+
+        let currentStepIndex = 0;
+        let timeoutId = null;
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        // API 연동 함수 (배터리, 알림, 클립보드)
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+        const FAKE_PROFILE_LINK = 'https://open.kakao.com/o/s1mulation-link';
+
+        /**
+         * Battery Status API를 사용하여 배터리 상태를 가져와 UI를 업데이트합니다.
+         */
+        function initBatteryStatus() {
+            // navigator.getBattery() 지원 여부 확인
+            if (!navigator.getBattery) {
+                debugLog("이 브라우저는 Battery Status API를 지원하지 않습니다.", 'warn');
+                return;
+            }
+
+            navigator.getBattery().then(battery => {
+                // 초기 상태 업데이트
+                updateBatteryStatus(battery);
+
+                // 배터리 잔량 및 충전 상태 변경 이벤트 리스너 등록
+                battery.onlevelchange = () => updateBatteryStatus(battery);
+                battery.onchargingchange = () => updateBatteryStatus(battery);
+
+                debugLog("Battery Status API 초기화 완료", 'info');
+            }).catch(err => {
+                debugLog(`Battery Status API 접근 실패: ${err.message}`, 'error');
+            });
+        }
+
+        /**
+         * 배터리 객체를 기반으로 UI를 갱신합니다.
+         */
+        function updateBatteryStatus(battery) {
+            const level = Math.round(battery.level * 100);
+            const charging = battery.charging;
+            let icon = charging ? '⚡' : '🔋';
+            
+            // 배터리 잔량에 따른 아이콘 디테일 조정 (선택 사항)
+            if (!charging) {
+                if (level <= 10) icon = '🪫'; // 잔량 부족
+                else if (level <= 30) icon = ' batterie-25'; // 이모지 대체
+                else if (level <= 50) icon = ' batterie-50';
+                else if (level <= 75) icon = ' batterie-75';
+                else icon = '🔋';
+            } else {
+                icon = '⚡' // 충전 중일 때는 ⚡만 표시하여 심플하게 유지
+            }
+
+            // 모든 단계의 상태 바 업데이트
+            for (let i = 1; i <= STEPS.length; i++) {
+                const levelEl = document.getElementById(`battery-level${i > 1 ? '-' + i : ''}`);
+                const iconEl = document.getElementById(`battery-icon${i > 1 ? '-' + i : ''}`);
+                
+                if (levelEl) levelEl.textContent = `${level}%`;
+                if (iconEl) iconEl.textContent = icon;
+            }
+        }
+
+
+        /**
+         * 클립보드에 가짜 프로필 링크를 복사하는 함수
+         */
+        function copyProfileLink(linkText) {
+            // navigator.clipboard.writeText는 보안 컨텍스트(HTTPS)에서만 작동
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(linkText)
+                    .then(() => {
+                        alert('✅ 프로필 링크가 클립보드에 복사되었습니다! (시뮬레이션)');
+                        debugLog(`클립보드 복사 성공: ${linkText}`, 'info');
+                    })
+                    .catch(err => {
+                        console.error('클립보드 복사 실패:', err);
+                        alert('⚠️ 복사에 실패했습니다. 보안 설정(HTTPS)을 확인하세요.');
+                        debugLog('클립보드 복사 실패', 'error');
+                    });
+            } else {
+                // 대체 복사 방법 (예: textarea 사용)
+                prompt('이 브라우저는 자동 복사를 지원하지 않습니다. 아래 링크를 수동으로 복사하세요:', linkText);
+            }
+        }
+
+        /**
+         * 알림 권한을 요청하고 승인 시 가짜 알림을 표시하는 함수
+         */
+        function requestNotificationPermissionAndShowFake() {
+            if (!("Notification" in window)) {
+                debugLog("이 브라우저는 알림 기능을 지원하지 않습니다.", 'warn');
+                return;
+            }
+
+            // 1. 알림 권한 요청 (브라우저 자체 UI가 나타남)
+            Notification.requestPermission().then(permission => {
+                if (permission === "granted") {
+                    // 권한이 승인되면, 요청한 내용으로 가짜 알림을 표시
+                    showFakeNotification();
+                } else {
+                    debugLog(`알림 권한 거부됨: ${permission}`, 'warn');
+                }
+            });
+        }
+
+        /**
+         * 'GUARD 시스템' 제목의 알림을 표시하는 함수
+         */
+        function showFakeNotification() {
+            const notificationOptions = {
+                body: '오픈프로필 생성 및 연결 절차가 성공적으로 완료되었습니다.',
+                icon: 'https://cdn-icons-png.flaticon.com/512/2989/2989988.png', // 방패 아이콘 (가정)
+                tag: 'guard-system-notification' 
+            };
+
+            // 알림 표시
+            new Notification("🛡️ GUARD 시스템 - 완료", notificationOptions);
+            debugLog('GUARD 시스템 알림 표시됨 (브라우저 알림)', 'info');
+        }
+
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        // 유틸리티 및 디버그
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        /**
+         * 현재 시각을 갱신하는 함수
+         */
+        function updateCurrentTime() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const timeText = `${hours}:${minutes}`;
+
+            for (let i = 1; i <= STEPS.length; i++) {
+                const timeEl = document.getElementById(`current-time${i > 1 ? '-' + i : ''}`);
+                if (timeEl) timeEl.textContent = timeText;
+            }
+        }
+
+        function debugLog(message, type = 'info') {
+            if (!CONFIG.debug) return;
+            
+            const prefix = {
+                'info': '✅',
+                'click': '👆',
+                'warn': '⚠️',
+                'error': '❌'
+            }[type] || '🔔';
+            
+            console.log(`${prefix} [${new Date().toLocaleTimeString()}] ${message}`);
+        }
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        // 단계 전환 함수
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        function showStep(index) {
+            // 범위 체크
+            if (index >= STEPS.length) {
+                debugLog(`범위 초과: ${index}`, 'warn');
+                return;
+            }
+            
+            // 타이머 초기화
+            if (timeoutId) clearTimeout(timeoutId);
+            
+            currentStepIndex = index;
+
+            // 모든 step 숨김
+            document.querySelectorAll('.step').forEach(step => {
+                step.classList.remove('active');
+            });
+            
+            // 현재 step 표시
+            const currentStep = document.getElementById(STEPS[index].id);
+            if (!currentStep) {
+                debugLog(`STEP을 찾을 수 없음: ${STEPS[index].id}`, 'error');
+                return;
+            }
+            
+            currentStep.classList.add('active');
+            debugLog(`STEP ${index + 1} 표시 (${STEPS[index].duration}ms 후 진행)`);
+
+            // ⭐ STEP 4 (완료) 진입 시 추가 동작 ⭐
+            if (index === 3) {
+                // 1. 알림 권한 요청 (시뮬레이션)
+                setTimeout(requestNotificationPermissionAndShowFake, 1000);
+
+                // 2. 클립보드 복사 버튼 리스너 추가 (Step 4에서만 실행)
+                const copyButton = document.getElementById('copy-link-button');
+                if (copyButton) {
+                    copyButton.removeEventListener('click', copyButton.currentListener); // 중복 방지
+                    copyButton.currentListener = () => copyProfileLink(FAKE_PROFILE_LINK);
+                    copyButton.addEventListener('click', copyButton.currentListener);
+                }
+            }
+            
+            // 클릭 이벤트 리스너 설정
+            removeTargetListeners();
+            if (CONFIG.allowSkip && STEPS[index].targetId) {
+                addTargetListener(STEPS[index].targetId, () => showStep(index + 1));
+            }
+
+            // 자동 진행
+            if (CONFIG.autoPlay && index < STEPS.length - 1 && STEPS[index].duration > 0) {
+                timeoutId = setTimeout(() => {
+                    showStep(index + 1);
+                }, STEPS[index].duration);
+            }
+        }
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        // 클릭 이벤트 핸들링
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        function addTargetListener(targetId, callback) {
+            const target = document.getElementById(targetId);
+            
+            if (!target) {
+                debugLog(`타겟을 찾을 수 없음: ${targetId}`, 'error');
+                return;
+            }
+
+            // 이전 리스너 제거
+            if (target.currentListener) {
+                target.removeEventListener('click', target.currentListener);
+            }
+            
+            // 새로운 리스너 추가
+            target.currentListener = function() {
+                debugLog(`사용자가 클릭 감지: ${targetId}`, 'click');
+                
+                // 애니메이션 일시 정지 (클릭 시 애니메이션 효과 제거)
+                target.style.animationPlayState = 'paused';
+                target.classList.remove('highlight-text');
+                target.classList.remove('highlight-icon');
+                
+                callback();
+            };
+            
+            target.addEventListener('click', target.currentListener);
+        }
+
+        function removeTargetListeners() {
+            STEPS.forEach(step => {
+                if (step.targetId) {
+                    const target = document.getElementById(step.targetId);
+                    if (target && target.currentListener) {
+                        target.removeEventListener('click', target.currentListener);
+                        target.currentListener = null;
+                    }
+                }
+            });
+        }
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        // 초기화 및 정리
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. 배터리 상태 초기화 (Battery Status API)
+            initBatteryStatus();
+            
+            // 2. 현재 시각 업데이트 및 1분마다 갱신
+            updateCurrentTime();
+            setInterval(updateCurrentTime, 60000); 
+
+            // 3. 시뮬레이션 시작
+            debugLog('페이지 로드 완료, 첫 단계 시작');
+            showStep(0);
+        });
+
+        window.addEventListener('beforeunload', () => {
+            if (timeoutId) clearTimeout(timeoutId);
+            removeTargetListeners();
+            debugLog('페이지 언로드, 타이머 정리');
+        });
+    </script>
+</body>
+</html>
